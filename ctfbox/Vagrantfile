@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # Configure the box.
+  config.vm.box = "archlinux/archlinux"
+  config.vm.hostname = "ctfbox"
+
+  # Configure SSH access.
+  config.ssh.username = "vagrant"
+  config.ssh.insert_key = true
+  config.ssh.forward_agent = true
+
+  # Forward ports. Modify as needed.
+#  config.vm.network "forwarded_port", guest: 8000, host: 8000
+#  config.vm.network "forwarded_port", guest: 24242, host: 24242
+
+  # Bump up the specs a bit
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--cpus", "2"]
+  end
+
+  # The following line prevents easy VM -> Host privesc through /vagrant/Vagrantfile.
+  # This does, however, only prevents unprivileged users from doing so as root in the
+  # VM can still `mount -o remount,rw`.
+  # If you are going to run untrusted code you should instead uncomment the second
+  # line to disable the /vagrant directory alltogether (or maybe not use vagrant at all).
+  # config.vm.synced_folder ".", "/vagrant", :mount_options => ["ro"], owner: "root", group: "root"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # Share CTF folder
+  config.vm.synced_folder "~/code/privat/ctf", "/home/vagrant/ctf"
+
+  # Do some basic provisioning.
+  config.vm.provision "file", source: "../scripts/packages.arch", destination: "/tmp/packages.arch"
+  config.vm.provision "shell", path: "../scripts/pacman.sh"
+  config.vm.provision "shell", path: "../scripts/yay.sh", privileged: false
+  config.vm.provision "shell", path: "../scripts/aur-packages.sh", privileged: false
+end
