@@ -39,5 +39,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "file", source: "../scripts/packages.arch", destination: "/tmp/packages.arch"
   config.vm.provision "shell", path: "../scripts/pacman.sh"
   config.vm.provision "shell", path: "../scripts/yay.sh", privileged: false
-  config.vm.provision "shell", path: "../scripts/aur-packages.sh", privileged: false
 end
